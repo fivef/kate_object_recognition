@@ -1,0 +1,38 @@
+<launch>
+
+  <arg name="debug" default="false" />
+  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+  <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />
+
+  <arg name="recognition_config_file"
+	       default="$(find kate_object_recognition)/config/detection.object.ros.ork"/>
+	<arg name="robot_frame"              default="base_link"/>
+  <arg name="sensor_frame"             default="kinect_rgb_optical_frame"/>
+
+  <!--This parameter is for ork/tabletop/src/table/TableDetector.cpp but it didn't 
+      work so it was directly set there. TODO: check why not working
+  <param name="sensor_frame" value="/kinect_rgb_optical_frame" />
+  -->
+
+  <node name="recognize_tabletop_objects_server" launch-prefix="$(arg launch_prefix)" pkg="object_recognition_ros" type="server" respawn="false" output="screen" args="--node_name tabletop_object_recognition -c $(arg recognition_config_file)>
+
+    
+<!-- no needed because this parameters are specified in config/detection.object.ros.ork
+    <remap from="/camera_rgb_image_rect_color" to="/kinect/rgb/image_rect_color"/>
+    <remap from="/camera_depth_registered_camera_info" to="/kinect/depth_registered/camera_info"/>
+    <remap from="/camera_rgb_camera_info" to="/kinect/rgb/camera_info"/>
+    <remap from="/camera_depth_registered_image_rect" to="/kinect/depth_registered/image_rect"/>
+-->   
+    <param name="tabletop_object_recognition/robot_frame"       value="$(arg robot_frame)"/>
+	  <param name="tabletop_object_recognition/sensor_frame"      value="$(arg sensor_frame)"/>
+	  <param name="tabletop_object_recognition/filter_planes"     value="true"/>
+	  <param name="tabletop_object_recognition/min_table_height"  value="0.4"/>
+	  <param name="tabletop_object_recognition/max_table_height"  value="0.9"/>
+	  <param name="tabletop_object_recognition/max_angle_diff"    value="0.1"/>
+	  <param name="tabletop_object_recognition/table_normal_x"    value="0"/>
+	  <param name="tabletop_object_recognition/table_normal_y"    value="0"/>
+	  <param name="tabletop_object_recognition/table_normal_z"    value="1"/>
+  </node>
+
+</launch>
+
